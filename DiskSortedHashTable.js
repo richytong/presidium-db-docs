@@ -78,6 +78,8 @@
  * ## Optimizing the disk sorted hash table b-tree
  * The value of `degree` determines the structure of the internal b-tree used by the disk sorted hash table. A higher value for `degree` results in a shorter b-tree and more items per b-tree node, while a lower value results in a taller b-tree and fewer items per b-tree node. The default value of 2 is a safe choice for most use cases.
  *
+ * ## Number of Running Instances
+ * There should only be one instance of a DiskSortedHashTable running at any time.
  */
 class DiskSortedHashTable {
   constructor(options) {

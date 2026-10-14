@@ -65,6 +65,8 @@
  *
  * Once all of the items have been added into the temporary storage file, the temporary storage file is moved to the location of the old storage file to be used as the new storage file.
  *
+ * ## Number of Running Instances
+ * There should only be one instance of a DiskHashTable running at any time.
  */
 class DiskHashTable {
   constructor(options) {}
