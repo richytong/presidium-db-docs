@@ -79,7 +79,7 @@ class DiskHashTable {
    *
    * @docs
    * ```coffeescript [specscript]
-   * ht.init() -> Promise<>
+   * init() -> Promise<>
    * ```
    *
    * Initializes the disk hash table.
