@@ -19,8 +19,8 @@
  *
  * Arguments:
  *   * `options`
- *     * `storagePath` - `string` - the path to the file used to store the disk sorted hash table data.
- *     * `headerPath` - `string` - the path to the file used to store header information about the disk sorted hash table.
+ *     * `storagePath` - `string` - the path to the file that stores the disk sorted hash table data.
+ *     * `headerPath` - `string` - the path to the file that stores header information about the disk sorted hash table.
  *     * `initialLength` - `number` - the initial length of the disk sorted hash table. Minimum value 1, maximum value `Math.floor(9007199254740991 / itemSize)`. Defaults to 1024.
  *     * `itemSize` - `number` - the size in bytes of each item (including internal item info, key, value, and sortValue) stored on disk. Minimum value 54. Defaults to 524288.
  *     * `sortValueType` - `'string'|'number'` - the type of the disk sorted hash table sort-values.
@@ -73,10 +73,10 @@
  * newTableLength = oldTableLength * resizeFactor
  * ```
  *
- * Once all of the items have been added into the temporary storage file, the temporary storage file is moved to the location of the old storage file to be used as the new storage file.
+ * Once all of the items have been added into the temporary storage file, the temporary storage file is moved to the location of the old storage file.
  *
  * ## Optimizing the disk sorted hash table b-tree
- * The value of `degree` determines the structure of the internal b-tree used by the disk sorted hash table. A higher value for `degree` results in a shorter b-tree and more items per b-tree node, while a lower value results in a taller b-tree and fewer items per b-tree node. The default value of 2 is a safe choice for most use cases.
+ * The value of `degree` determines the structure of the internal b-tree of the disk sorted hash table. A higher value for `degree` results in a shorter b-tree and more items per b-tree node, while a lower value results in a taller b-tree and fewer items per b-tree node. The default value of 2 is good for any number of items.
  *
  * ## Number of Running Instances
  * There should only be one instance of a DiskSortedHashTable running per storage and header file per machine at a time.
@@ -140,7 +140,7 @@ class DiskSortedHashTable {
    * destroy() -> Promise<>
    * ```
    *
-   * Removes all system resources used by the disk sorted hash table.
+   * Removes all system resources taken up by the disk sorted hash table.
    *
    * Arguments:
    *   * (none)
@@ -162,7 +162,7 @@ class DiskSortedHashTable {
    * close() -> undefined
    * ```
    *
-   * Closes the underlying file handles used by the disk sorted hash table.
+   * Closes the underlying file handles of the disk sorted hash table.
    *
    * Arguments:
    *   * (none)

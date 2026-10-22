@@ -17,8 +17,8 @@
  *
  * Arguments:
  *   * `options`
- *     * `storagePath` - `string` - the path to the file used to store the disk hash table data.
- *     * `headerPath` - `string` - the path to the file used to store header information about the disk hash table.
+ *     * `storagePath` - `string` - the path to the file that stores the disk hash table data.
+ *     * `headerPath` - `string` - the path to the file that stores the header information about the disk hash table.
  *     * `initialLength` - `number` - the initial length of the disk hash table. Minimum value 1, maximum value `Math.floor(9007199254740991 / itemSize)`. Defaults to 1024.
  *     * `itemSize` - `number` - the size in bytes of each item (including internal item info, key, and value) stored on disk. Minimum value 17. Defaults to 524288.
  *     * `resizeRatio` - `number` - the ratio of number of items to table length at which to resize the disk hash table. Minimum value 0 (no resize), maximum value 1. Defaults to 0.
@@ -63,7 +63,7 @@
  * newTableLength = oldTableLength * resizeFactor
  * ```
  *
- * Once all of the items have been added into the temporary storage file, the temporary storage file is moved to the location of the old storage file to be used as the new storage file.
+ * Once all of the items have been added into the temporary storage file, the temporary storage file is moved to the location of the old storage file.
  *
  * ## Number of Running Instances
  * There should only be one instance of a DiskHashTable running per storage and header file per machine at a time.
@@ -126,7 +126,7 @@ class DiskHashTable {
    * destroy() -> Promise<>
    * ```
    *
-   * Removes all system resources used by the disk hash table.
+   * Removes all system resources taken up by the disk hash table.
    *
    * Arguments:
    *   * (none)
@@ -148,7 +148,7 @@ class DiskHashTable {
    * close() -> undefined
    * ```
    *
-   * Closes the underlying file handles used by the disk hash table.
+   * Closes the underlying file handles of the disk hash table.
    *
    * Arguments:
    *   * (none)
