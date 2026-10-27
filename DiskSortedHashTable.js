@@ -8,7 +8,7 @@
  *   headerPath: string,
  *   initialLength: number,
  *   itemSize: number,
- *   sortValueType: 'string'|'number',
+ *   sortValueType: "string"|"number"|Array<"string"|"number">,
  *   resizeRatio: number,
  *   resizeFactor: number,
  *   degree: number,
@@ -23,7 +23,7 @@
  *     * `headerPath` - `string` - the path to the file that stores header information about the disk sorted hash table.
  *     * `initialLength` - `number` - the initial length of the disk sorted hash table. Minimum value 1, maximum value `Math.floor(9007199254740991 / itemSize)`. Defaults to 1024.
  *     * `itemSize` - `number` - the size in bytes of each item (including internal item info, key, value, and sortValue) stored on disk. Minimum value 54. Defaults to 524288.
- *     * `sortValueType` - `'string'|'number'` - the type of the disk sorted hash table sort-values.
+ *     * `sortValueType` - `"string"|"number"|Array<"string"|"number">` - the type of the disk sorted hash table sort values. If this value is an array, the sort value will be treated as a composite sort value. A composite sort value has each element of the array compared in order.
  *     * `resizeRatio` - `number` - the ratio of number of items to table length at which to resize the disk sorted hash table. Minimum value 0 (no resize), maximum value 1. Defaults to 0.
  *     * `resizeFactor` - `number` - the factor that is multiplied with the disk sorted hash table's current length to determine the new table length on a resize.
  *     * `degree` - `number` - minimum value 2, defaults to 2 - defines the following parameters for the internal b-tree that organizes all of the items in the disk sorted hash table:
@@ -37,11 +37,22 @@
  *
  * ```javascript
  * const sortedHt = new DiskSortedHashTable({
- *   storagePath: '/path/to/storage-file',
- *   headerPath: '/path/to/header-file',
+ *   storagePath: "/path/to/storage-file",
+ *   headerPath: "/path/to/header-file",
  *   initialLength: 1024,
  *   itemSize: 512 * 1024,
- *   sortValueType: 'number',
+ *   sortValueType: "number",
+ *   resizeRatio: 0.5,
+ *   resizeFactor: 1000,
+ *   degree: 2,
+ * })
+ *
+ * const compositeSortValueHt = new DiskSortedHashTable({
+ *   storagePath: "/path/to/storage-file",
+ *   headerPath: "/path/to/header-file",
+ *   initialLength: 1024,
+ *   itemSize: 512 * 1024,
+ *   sortValueType: ["string", "number"],
  *   resizeRatio: 0.5,
  *   resizeFactor: 1000,
  *   degree: 2,
@@ -62,10 +73,10 @@
  * The disk sorted hash table initially preallocates a block of memory on disk of `(itemSize * initialLength)` bytes as the storage file and a 48-byte block of memory as the header file for database operations. When the disk sorted hash table is resized, the block of memory on disk is reallocated to a new size of `(itemSize * initialLength * numberOfResizes * resizeFactor)` bytes.
  *
  * ## Byte allocations for an item
- * Each item stored on disk is allocated `itemSize` bytes of disk space. The first 53 bytes are reserved for table operations. The remainder is reserved for the key, sort-value, and value of the item.
+ * Each item stored on disk is allocated `itemSize` bytes of disk space. The first 53 bytes are reserved for table operations. The remainder is reserved for the key, sort value, and value of the item.
  *
  * ## Resizing the disk sorted hash table
- * When an item is inserted into the disk sorted hash table via [set](/docs/DiskSortedHashTable#set), the current capacity ratio of the table is calculated as the sum of the table's count and deleted count divided by the table's length. If the current capacity ratio exceeds the `resizeRatio` (and the `resizeRatio` is not 0), a resize of the table occurs.
+ * When an item is inserted into the disk sorted hash table via [set](/docs/DiskSortedHashTable#set), the current capacity ratio of the table is calculated as the sum of the table"s count and deleted count divided by the table"s length. If the current capacity ratio exceeds the `resizeRatio` (and the `resizeRatio` is not 0), a resize of the table occurs.
  *
  * During a table resize, each item of the table is added into a temporary storage file using the new table length calculated from the equation below:
  *
@@ -553,23 +564,23 @@ class DiskSortedHashTable {
   // }
   _parseItemHead(headReadBuffer, index) {}
 
-  // _parseItem(readBuffer Buffer, index number, valueType 'string'|'binary') -> {
+  // _parseItem(readBuffer Buffer, index number, valueType "string"|"binary") -> {
   //   index: number,
   //   readBuffer: Buffer,
   //   sortValue: string|number,
   //   key: string,
   //   value: string,
   // }
-  _parseItem(readBuffer, index, valueType = 'binary') {}
+  _parseItem(readBuffer, index, valueType = "binary") {}
 
-  // _getForwardStartItem(valueType 'string'|'binary') -> item { index: number, readBuffer: Buffer, sortValue: string|number, value: string }
-  async _getForwardStartItem(valueType = 'binary') {}
+  // _getForwardStartItem(valueType "string"|"binary") -> item { index: number, readBuffer: Buffer, sortValue: string|number, value: string }
+  async _getForwardStartItem(valueType = "binary") {}
 
-  // _getReverseStartItem(valueType 'string'|'number') -> item { index: number, readBuffer: Buffer, sortValue: string|number, value: string }
-  async _getReverseStartItem(valueType = 'binary') {}
+  // _getReverseStartItem(valueType "string"|"number") -> item { index: number, readBuffer: Buffer, sortValue: string|number, value: string }
+  async _getReverseStartItem(valueType = "binary") {}
 
-  // _getItem(index number, valueType 'string'|'binary') -> item { index: number, readBuffer: Buffer, sortValue: string|number, value: string }
-  async _getItem(index, valueType = 'binary') {}
+  // _getItem(index number, valueType "string"|"binary") -> item { index: number, readBuffer: Buffer, sortValue: string|number, value: string }
+  async _getItem(index, valueType = "binary") {}
 
   // _updateForwardIndex(index number, forwardIndex number) -> Promise<>
   async _updateForwardIndex(index, forwardIndex) {}
@@ -598,13 +609,13 @@ class DiskSortedHashTable {
   // _insert(key string, value string|Buffer|Uint8Array, sortValue number|string, index number) -> Promise<>
   async _insert(key, value, sortValue, index) {}
 
-// _update(key string, value string|Buffer|Uint8Array, sortValue number|string, index number, item {
-//   index: number,
-//   sortValue: string|number,
-//   btreeLeftChildNodeRightmostItemIndex: number,
-//   btreeRightChildNodeRightmostItemIndex: number,
-//   btreeLeftItemIndex: number,
-// }) -> Promise<>
+  // _update(key string, value string|Buffer|Uint8Array, sortValue number|string, index number, item {
+  //   index: number,
+  //   sortValue: string|number,
+  //   btreeLeftChildNodeRightmostItemIndex: number,
+  //   btreeRightChildNodeRightmostItemIndex: number,
+  //   btreeLeftItemIndex: number,
+  // }) -> Promise<>
   async _update(key, value, sortValue, index, item) {}
 
   // _resize() -> Promise<>
@@ -618,30 +629,34 @@ class DiskSortedHashTable {
    *
    * @docs
    * ```coffeescript [specscript]
-   * set(key string, value string|Buffer|Uint8Array, sortValue string|number) -> Promise<>
+   * set(key string, value string|Buffer|Uint8Array, ...sortValues Arguments<string|number>) -> Promise<>
    * ```
    *
-   * Sets and stores a value by key and sort-value in the disk sorted hash table.
+   * Sets and stores a value by key and sort value in the disk sorted hash table.
    *
    * Arguments:
    *   * `key` - `string` - the key to set.
    *   * `value` - `string|Buffer|Uint8Array` - the value to set corresponding to the key.
-   *   * `sortValue` - `string|number` - the value by which the item is sorted in the disk sorted hash table.
+   *   * `sortValues` - `Arguments<string|number>` - values by which the item is indexed and sorted in the disk sorted hash table. If multiple sort values are provided, the sort values are treated as a composite sort value. Composite sort values have each element of their arrays compared in order.
    *
    * Return:
    *   * Empty promise.
    *
    * ```javascript
-   * await sortedHt.set('key1', 'value1', 1)
-   * await sortedHt.set('key2', 'value2', 2)
-   * await sortedHt.set('key3', 'value3', 3)
+   * await sortedHt.set("key1", "value1", 1)
+   * await sortedHt.set("key2", "value2", 2)
+   * await sortedHt.set("key3", "value3", 3)
    *
-   * await sortedHt.set('my-buffer', Buffer.from('binary'), 4)
+   * await sortedHt.set("my-buffer", Buffer.from("binary"), 4)
+   *
+   * await compositeSortValueHt.set("key1", "value1", "index-key1", 1)
+   * await compositeSortValueHt.set("key2", "value2", "index-key1", 2)
+   * await compositeSortValueHt.set("key3", "value3", "index-key1", 3)
    * ```
    */
-  async set(key, value, sortValue) {}
+  async set(key, value, ...sortValues) {}
 
-  // _get(key string, valueType 'string'|'binary')
+  // _get(key string, valueType "string"|"binary")
   async _get(key, valueType) {}
 
   /**
@@ -661,7 +676,7 @@ class DiskSortedHashTable {
    *   * `value` - `Promise<string|undefined>` - a promise of the string value corresponding to the key. If the key is not found, the promise resolves with `undefined`.
    *
    * ```javascript
-   * const value = await sortedHt.get('my-key')
+   * const value = await sortedHt.get("my-key")
    * ```
    */
   async get(key) {}
@@ -683,7 +698,7 @@ class DiskSortedHashTable {
    *   * `binaryValue` - `Promise<Buffer|undefined>` - a promise of the binary value corresponding to the key. If the key is not found, the promise resolves with `undefined`.
    *
    * ```javascript
-   * const buffer = await ht.getBinary('my-buffer')
+   * const buffer = await ht.getBinary("my-buffer")
    * ```
    */
   async getBinary(key) {}
@@ -778,54 +793,74 @@ class DiskSortedHashTable {
    *
    * forwardIterator(options {
    *   exclusiveStartKey: string,
-   *   startingSortValue: string|number,
-   *   endingSortValue: string|number,
-   *   valueType: 'string'|'binary',
+   *   startingSortValue: string|number|Array<string|number>,
+   *   endingSortValue: string|number|Array<string|number>,
+   *   valueType: "string"|"binary",
+   *   limit: number,
    * }) -> values AsyncGenerator<string|Buffer>
    * ```
    *
-   * Returns an iterator of the values of all items in the disk sorted hash table sorted by sort-value. Item values are yielded in ascending order.
+   * Returns an iterator of the values of all items in the disk sorted hash table sorted by sort value. Item values are yielded in ascending order.
    *
-   * If a starting sort-value and ending sort-value are provided, the iterator returns only values of items with sort-values between the starting and ending sort-values, including values of items with sort-values equal to the starting and ending sort-values. If only a starting sort-value is provided, the iterator returns values of items with sort-values greater than or equal to the starting sort-value. If only an ending sort-value is provided, the iterator returns values of items with sort-values less than or equal to the ending sort-value.
+   * If a starting sort value and ending sort value are provided, the iterator returns only values of items with sort values between the starting and ending sort values, including values of items with sort values equal to the starting and ending sort values. If only a starting sort value is provided, the iterator returns values of items with sort values greater than or equal to the starting sort value. If only an ending sort value is provided, the iterator returns values of items with sort values less than or equal to the ending sort value.
    *
-   * If an exclusive start key is provided, the iterator returns values of items with sort-values greater than or equal to the sort-value of the item at the exclusive start key, not including the value of the item at the exclusive start key. The exclusive start key takes precedence over the starting sort-value.
+   * If an exclusive start key is provided, the iterator returns values of items with sort values greater than or equal to the sort value of the item at the exclusive start key, not including the value of the item at the exclusive start key. The exclusive start key takes precedence over the starting sort value.
    *
    * Arguments:
    *   * (none) - retrieves the values of all items in the disk sorted hash table.
    *   * `options`
    *     * `exclusiveStartKey` - `string` - the key after which to start iterating.
-   *     * `startingSortValue` - `string|number` - the sort-value from which to start iterating.
-   *     * `endingSortValue` - `string|number` - the sort-value at which to stop iterating.
-   *     * `valueType` - `'string'|'binary'` - the type of value that the iterator yields. Defaults to `'string'`.
-   *       * `'string'` - iterator yields `string` values.
-   *       * `'binary'` - iterator yields `Buffer` values.
+   *     * `startingSortValue` - `string|number|Array<string|number>` - the sort value from which to start iterating. If this value is an array, the starting sort value is treated as a composite sort value. Composite sort values have each element of their arrays compared in order.
+   *     * `endingSortValue` - `string|number|Array<string|number>` - the sort value at which to stop iterating. If this value is an array, the ending sort value is treated as a composite sort value. Composite sort values have each element of their arrays compared in order.
+   *     * `valueType` - `"string"|"binary"` - the type of value that the iterator yields. Defaults to `"string"`.
+   *       * `"string"` - iterator yields `string` values.
+   *       * `"binary"` - iterator yields `Buffer` values.
+   *     * `limit` - `number` - the maximum number of values to yield from the iterator.
    *
    * Return:
-   *   * `values` - `AsyncGenerator<string|Buffer>` - an async generator of the values of all items in the disk sorted hash table sorted by sort-value in ascending order.
+   *   * `values` - `AsyncGenerator<string|Buffer>` - an async generator of the values of all items in the disk sorted hash table sorted by sort value in ascending order.
    *
    * ```javascript
-   * await ht.set('key1', 'value1', 1)
-   * await ht.set('key2', 'value2', 2)
-   * await ht.set('key3', 'value3', 3)
+   * await sortedHt.set("key1", "value1", 1)
+   * await sortedHt.set("key2", "value2", 2)
+   * await sortedHt.set("key3", "value3", 3)
    *
-   * for await (const value of ht.forwardIterator()) {
+   * for await (const value of sortedHt.forwardIterator()) {
    *   console.log(value) // value1
    *                      // value2
    *                      // value3
    * }
    *
-   * for await (const value of ht.forwardIterator({ startingSortValue: 2, endingSortValue: 3 })) {
+   * for await (const value of sortedHt.forwardIterator({ limit: 1 })) {
+   *   console.log(value) // value1
+   *                      // value2
+   *                      // value3
+   * }
+   *
+   * for await (const value of sortedHt.forwardIterator({ startingSortValue: 2, endingSortValue: 3 })) {
    *   console.log(value) // value2
    *                      // value3
    * }
    *
-   * for await (const value of ht.forwardIterator({ exclusiveStartKey: 'key1' })) {
+   * for await (const value of sortedHt.forwardIterator({ exclusiveStartKey: "key1" })) {
    *   console.log(value) // value2
    *                      // value3
    * }
    *
-   * for await (const value of ht.forwardIterator({ exclusiveStartKey: 'key1', endingSortValue: 2 })) {
+   * for await (const value of sortedHt.forwardIterator({ exclusiveStartKey: "key1", endingSortValue: 2 })) {
    *   console.log(value) // value2
+   * }
+   *
+   * await compositeSortValueHt.set("key1", "value1", "index-key1", 1)
+   * await compositeSortValueHt.set("key2", "value2", "index-key1", 2)
+   * await compositeSortValueHt.set("key3", "value3", "index-key1", 3)
+   *
+   * for await (const value of compositeSortValueHt.forwardIterator({
+   *   startingSortValue: ["index-key1", 2],
+   *   endingSortValue: ["index-key1", 3],
+   * })) {
+   *   console.log(value) // value2
+   *                      // value3
    * }
    * ```
    */
@@ -840,35 +875,37 @@ class DiskSortedHashTable {
    *
    * reverseIterator(options {
    *   exclusiveStartKey: string,
-   *   startingSortValue: string|number,
-   *   endingSortValue: string|number,
-   *   valueType: 'string'|'binary',
+   *   startingSortValue: string|number|Array<string|number>,
+   *   endingSortValue: string|number|Array<string|number>,
+   *   valueType: "string"|"binary",
+   *   limit: number,
    * }) -> values AsyncGenerator<string|Buffer>
    * ```
    *
-   * Returns an iterator of the values of all items in the disk sorted hash table sorted by sort-value. Item values are yielded in descending order.
+   * Returns an iterator of the values of all items in the disk sorted hash table sorted by sort value. Item values are yielded in descending order.
    *
-   * If a starting sort-value and ending sort-value are provided, the iterator returns only values of items with sort-values between the starting and ending sort-values, including values of items with sort-values equal to the starting and ending sort-values. If only a starting sort-value is provided, the iterator returns values of items with sort-values less than or equal to the starting sort-value.
+   * If a starting sort value and ending sort value are provided, the iterator returns only values of items with sort values between the starting and ending sort values, including values of items with sort values equal to the starting and ending sort values. If only a starting sort value is provided, the iterator returns values of items with sort values less than or equal to the starting sort value.
    *
-   * If an exclusive start key is provided, the iterator returns values of items with sort-values less than or equal to the sort-value of the item at the exclusive start key, not including the value of the item at the exclusive start key. The exclusive start key takes precedence over the starting sort-value.
+   * If an exclusive start key is provided, the iterator returns values of items with sort values less than or equal to the sort value of the item at the exclusive start key, not including the value of the item at the exclusive start key. The exclusive start key takes precedence over the starting sort value.
    *
    * Arguments:
    *   * (none) - retrieves the values of all items in the disk sorted hash table.
    *   * `options`
    *     * `exclusiveStartKey` - `string` - the key after which to start iterating.
-   *     * `startingSortValue` - `string|number` - the sort-value from which to start iterating.
-   *     * `endingSortValue` - `string|number` - the sort-value at which to stop iterating.
-   *     * `valueType` - `'string'|'binary'` - the type of value that the iterator yields. Defaults to `'string'`.
+   *     * `startingSortValue` - `string|number|Array<string|number>` - the sort value from which to start iterating. If this value is an array, the starting sort value is treated as a composite sort value. Composite sort values have each element of their arrays compared in order.
+   *     * `endingSortValue` - `string|number|Array<string|number>` - the sort value at which to stop iterating. If this value is an array, the ending sort value is treated as a composite sort value. Composite sort values have each element of their arrays compared in order.
+   *     * `valueType` - `"string"|"binary"` - the type of value that the iterator yields. Defaults to `"string"`.
    *       * `string` - iterator yields `string` values.
    *       * `binary` - iterator yields `Buffer` values.
+   *     * `limit` - `number` - the maximum number of values to yield from the iterator.
    *
    * Return:
-   *   * `values` - `AsyncGenerator<string|Buffer>` - an async generator of the values of all items in the disk sorted hash table sorted by sort-value in descending order.
+   *   * `values` - `AsyncGenerator<string|Buffer>` - an async generator of the values of all items in the disk sorted hash table sorted by sort value in descending order.
    *
    * ```javascript
-   * await ht.set('key1', 'value1', 1)
-   * await ht.set('key2', 'value2', 2)
-   * await ht.set('key3', 'value3', 3)
+   * await ht.set("key1", "value1", 1)
+   * await ht.set("key2", "value2", 2)
+   * await ht.set("key3", "value3", 3)
    *
    * for await (const value of ht.reverseIterator()) {
    *   console.log(value) // value3
@@ -876,18 +913,34 @@ class DiskSortedHashTable {
    *                      // value1
    * }
    *
+   * for await (const value of sortedHt.reverseIterator({ limit: 1 })) {
+   *   console.log(value) // value3
+   * }
+   *
    * for await (const value of ht.reverseIterator({ startingSortValue: 2, endingSortValue: 1 })) {
    *   console.log(value) // value2
    *                      // value1
    * }
    *
-   * for await (const value of ht.reverseIterator({ exclusiveStartKey: 'key3' })) {
+   * for await (const value of ht.reverseIterator({ exclusiveStartKey: "key3" })) {
    *   console.log(value) // value2
    *                      // value1
    * }
    *
-   * for await (const value of ht.reverseIterator({ exclusiveStartKey: 'key3', endingSortValue: 2 })) {
+   * for await (const value of ht.reverseIterator({ exclusiveStartKey: "key3", endingSortValue: 2 })) {
    *   console.log(value) // value2
+   * }
+   *
+   * await compositeSortValueHt.set("key1", "value1", "index-key1", 1)
+   * await compositeSortValueHt.set("key2", "value2", "index-key1", 2)
+   * await compositeSortValueHt.set("key3", "value3", "index-key1", 3)
+   *
+   * for await (const value of compositeSortValueHt.reverseIterator({
+   *   startingSortValue: ["index-key1", 3],
+   *   endingSortValue: ["index-key1", 2],
+   * })) {
+   *   console.log(value) // value3
+   *                      // value2
    * }
    * ```
    */
@@ -898,39 +951,63 @@ class DiskSortedHashTable {
    *
    * @docs
    * ```coffeescript [specscript]
-   * forwardEntriesIterator() -> entries AsyncGenerator<[key string, value string, sortValue string|number]>
-   *
-   * forwardEntriesIterator(options {
+   * options {
    *   exclusiveStartKey: string,
-   *   startingSortValue: string|number,
-   *   endingSortValue: string|number,
-   *   valueType: 'string'|'binary',
-   * }) -> entries AsyncGenerator<[key string, value string|Buffer, sortValue string|number]>
+   *   startingSortValue: string|number|Array<string|number>,
+   *   endingSortValue: string|number|Array<string|number>,
+   *   valueType: "string"|"binary",
+   *   limit: number,
+   * }
+   *
+   * forwardEntriesIterator() -> entries AsyncGenerator<[
+   *   key string,
+   *   value string|Buffer,
+   *   sortValue string|number,
+   * ]>
+   *
+   * forwardEntriesIterator() -> entries AsyncGenerator<[
+   *   key string,
+   *   value string|Buffer,
+   *   ...sortValue Array<string|number>,
+   * ]>
+   *
+   * forwardEntriesIterator(options) -> entries AsyncGenerator<[
+   *   key string,
+   *   value string|Buffer,
+   *   sortValue string|number,
+   * ]>
+   *
+   * forwardEntriesIterator(options) -> entries AsyncGenerator<[
+   *   key string,
+   *   value string|Buffer,
+   *   ...sortValue Array<string|number>,
+   * ]>
    * ```
    *
-   * Returns an iterator of the entries (key, value, and sort-value) of all items in the disk sorted hash table sorted by sort-value. Item entries are yielded in ascending order.
+   * Returns an iterator of the entries (key, value, and sort value) of all items in the disk sorted hash table sorted by sort value. Item entries are yielded in ascending order.
    *
-   * If a starting sort-value and ending sort-value are provided, the iterator returns only entries of items with sort-values between the starting and ending sort-values, including entries of items with sort-values equal to the starting and ending sort-values. If only a starting sort-value is provided, the iterator returns entries of items with sort-values greater than or equal to the starting sort-value. If only an ending sort-value is provided, the iterator returns entries of items with sort-values less than or equal to the ending sort-value.
+   * If a starting sort value and ending sort value are provided, the iterator returns only entries of items with sort values between the starting and ending sort values, including entries of items with sort values equal to the starting and ending sort values. If only a starting sort value is provided, the iterator returns entries of items with sort values greater than or equal to the starting sort value. If only an ending sort value is provided, the iterator returns entries of items with sort values less than or equal to the ending sort value.
    *
-   * If an exclusive start key is provided, the iterator returns entries of items with sort-values greater than or equal to the sort-value of the item at the exclusive start key, not including the entry of the item at the exclusive start key. The exclusive start key takes precedence over the starting sort-value.
+   * If an exclusive start key is provided, the iterator returns entries of items with sort values greater than or equal to the sort value of the item at the exclusive start key, not including the entry of the item at the exclusive start key. The exclusive start key takes precedence over the starting sort value.
    *
    * Arguments:
    *   * (none) - retrieves the entries of all items in the disk sorted hash table.
    *   * `options`
    *     * `exclusiveStartKey` - `string` - the key after which to start iterating.
-   *     * `startingSortValue` - `string|number` - the sort-value from which to start iterating.
-   *     * `endingSortValue` - `string|number` - the sort-value at which to stop iterating.
-   *     * `valueType` - `'string'|'binary'` - the type of value that the iterator yields. Defaults to `'string'`.
-   *       * `'string'` - iterator yields entries with `string` values.
-   *       * `'binary'` - iterator yields entries with `Buffer` values.
+   *     * `startingSortValue` - `string|number|Array<string|number>` - the sort value from which to start iterating. If this value is an array, the starting sort value is treated as a composite sort value. Composite sort values have each element of their arrays compared in order.
+   *     * `endingSortValue` - `string|number|Array<string|number>` - the sort value at which to stop iterating. If this value is an array, the ending sort value is treated as a composite sort value. Composite sort values have each element of their arrays compared in order.
+   *     * `valueType` - `"string"|"binary"` - the type of value that the iterator yields. Defaults to `"string"`.
+   *       * `"string"` - iterator yields entries with `string` values.
+   *       * `"binary"` - iterator yields entries with `Buffer` values.
+   *     * `limit` - `number` - the maximum number of entries to yield from the iterator.
    *
    * Return:
-   *   * `entries` - `AsyncGenerator<[key string, value string|Buffer, sortValue string|number]>` - an async generator of the entries of all items in the disk sorted hash table sorted by sort-value in ascending order.
+   *   * `entries` - `AsyncGenerator<[key string, value string|Buffer, sortValue string|number]>` - an async generator of the entries of all items in the disk sorted hash table sorted by sort value in ascending order.
    *
    * ```javascript
-   * await ht.set('key1', 'value1', 1)
-   * await ht.set('key2', 'value2', 2)
-   * await ht.set('key3', 'value3', 3)
+   * await ht.set("key1", "value1", 1)
+   * await ht.set("key2", "value2", 2)
+   * await ht.set("key3", "value3", 3)
    *
    * for await (const [key, value, sortValue] of ht.forwardEntriesIterator()) {
    *   console.log(key, value, sortValue) // key1 value1 1
@@ -938,18 +1015,34 @@ class DiskSortedHashTable {
    *                                      // key3 value3 3
    * }
    *
+   * for await (const [key, value, sortValue] of ht.forwardEntriesIterator({ limit: 1 })) {
+   *   console.log(key, value, sortValue) // key1 value1 1
+   * }
+   *
    * for await (const [key, value, sortValue] of ht.forwardEntriesIterator({ startingSortValue: 2, endingSortValue: 3 })) {
    *   console.log(key, value, sortValue) // key2 value2 2
    *                                      // key3 value3 3
    * }
    *
-   * for await (const [key, value, sortValue] of ht.forwardEntriesIterator({ exclusiveStartKey: 'key1' })) {
+   * for await (const [key, value, sortValue] of ht.forwardEntriesIterator({ exclusiveStartKey: "key1" })) {
    *   console.log(key, value, sortValue) // key2 value2 2
    *                                      // key3 value3 3
    * }
    *
-   * for await (const [key, value, sortValue] of ht.forwardEntriesIterator({ exclusiveStartKey: 'key1', endingSortValue: 2 })) {
+   * for await (const [key, value, sortValue] of ht.forwardEntriesIterator({ exclusiveStartKey: "key1", endingSortValue: 2 })) {
    *   console.log(key, value, sortValue) // key2 value2 2
+   * }
+   *
+   * await compositeSortValueHt.set("key1", "value1", "index-key1", 1)
+   * await compositeSortValueHt.set("key2", "value2", "index-key1", 2)
+   * await compositeSortValueHt.set("key3", "value3", "index-key1", 3)
+   *
+   * for await (const [key, value, ...sortValue] of compositeSortValueHt.forwardEntriesIterator({
+   *   startingSortValue: ["index-key1", 2],
+   *   endingSortValue: ["index-key1", 3],
+   * })) {
+   *   console.log(key, value, sortValue) // key2 value2 ["index-key1", 2]
+   *                                      // key3 value3 ["index-key1", 3]
    * }
    * ```
    */
@@ -960,39 +1053,63 @@ class DiskSortedHashTable {
    *
    * @docs
    * ```coffeescript [specscript]
-   * reverseEntriesIterator() -> entries AsyncGenerator<[key string, value string, sortValue string|number]>
-   *
-   * reverseEntriesIterator(options {
+   * options {
    *   exclusiveStartKey: string,
-   *   startingSortValue: string|number,
-   *   endingSortValue: string|number,
-   *   valueType: 'string'|'binary',
-   * }) -> entries AsyncGenerator<[key string, value string|Buffer, sortValue string|number]>
+   *   startingSortValue: string|number|Array<string|number>,
+   *   endingSortValue: string|number|Array<string|number>,
+   *   valueType: "string"|"binary",
+   *   limit: number,
+   * }
+   *
+   * reverseEntriesIterator() -> entries AsyncGenerator<[
+   *   key string,
+   *   value string|Buffer,
+   *   sortValue string|number,
+   * ]>
+   *
+   * reverseEntriesIterator() -> entries AsyncGenerator<[
+   *   key string,
+   *   value string|Buffer,
+   *   ...sortValue Array<string|number>,
+   * ]>
+   *
+   * reverseEntriesIterator(options) -> entries AsyncGenerator<[
+   *   key string,
+   *   value string|Buffer,
+   *   sortValue string|number,
+   * ]>
+   *
+   * reverseEntriesIterator(options) -> entries AsyncGenerator<[
+   *   key string,
+   *   value string|Buffer,
+   *   ...sortValue Array<string|number>,
+   * ]>
    * ```
    *
-   * Returns an iterator of the entries (key, value, and sort-value) of all items in the disk sorted hash table sorted by sort-value. Item entries are yielded in descending order.
+   * Returns an iterator of the entries (key, value, and sort value) of all items in the disk sorted hash table sorted by sort value. Item entries are yielded in descending order.
    *
-   * If a starting sort-value and ending sort-value are provided, the iterator returns only entries of items with sort-values between the starting and ending sort-values, including entries of items with sort-values equal to the starting and ending sort-values. If only a starting sort-value is provided, the iterator returns entries of items with sort-values less than or equal to the starting sort-value.
+   * If a starting sort value and ending sort value are provided, the iterator returns only entries of items with sort values between the starting and ending sort values, including entries of items with sort values equal to the starting and ending sort values. If only a starting sort value is provided, the iterator returns entries of items with sort values less than or equal to the starting sort value.
    *
-   * If an exclusive start key is provided, the iterator returns entries of items with sort-values less than or equal to the sort-value of the item at the exclusive start key, not including the entry of the item at the exclusive start key. The exclusive start key takes precedence over the starting sort-value.
+   * If an exclusive start key is provided, the iterator returns entries of items with sort values less than or equal to the sort value of the item at the exclusive start key, not including the entry of the item at the exclusive start key. The exclusive start key takes precedence over the starting sort value.
    *
    * Arguments:
    *   * (none) - retrieves the entries of all items in the disk sorted hash table.
    *   * `options`
    *     * `exclusiveStartKey` - `string` - the key after which to start iterating.
-   *     * `startingSortValue` - `string|number` - the sort-value from which to start iterating.
-   *     * `endingSortValue` - `string|number` - the sort-value at which to stop iterating.
-   *     * `valueType` - `'string'|'binary'` - the type of value that the iterator yields. Defaults to `'string'`.
+   *     * `startingSortValue` - `string|number|Array<string|number>` - the sort value from which to start iterating. If this value is an array, the starting sort value is treated as a composite sort value. Composite sort values have each element of their arrays compared in order.
+   *     * `endingSortValue` - `string|number|Array<string|number>` - the sort value at which to stop iterating. If this value is an array, the ending sort value is treated as a composite sort value. Composite sort values have each element of their arrays compared in order.
+   *     * `valueType` - `"string"|"binary"` - the type of value that the iterator yields. Defaults to `"string"`.
    *       * `string` - iterator yields entries with `string` values.
    *       * `binary` - iterator yields entries with `Buffer` values.
+   *     * `limit` - `number` - the maximum number of entries to yield from the iterator.
    *
    * Return:
-   *   * `entries` - `AsyncGenerator<[key string, value string|Buffer, sortValue string|number]>` - an async generator of the entries of all items in the disk sorted hash table sorted by sort-value in descending order.
+   *   * `entries` - `AsyncGenerator<[key string, value string|Buffer, sortValue string|number]>` - an async generator of the entries of all items in the disk sorted hash table sorted by sort value in descending order.
    *
    * ```javascript
-   * await ht.set('key1', 'value1', 1)
-   * await ht.set('key2', 'value2', 2)
-   * await ht.set('key3', 'value3', 3)
+   * await ht.set("key1", "value1", 1)
+   * await ht.set("key2", "value2", 2)
+   * await ht.set("key3", "value3", 3)
    *
    * for await (const [key, value, sortValue] of ht.reverseEntriesIterator()) {
    *   console.log(key, value, sortValue) // key3 value3 3
@@ -1000,18 +1117,34 @@ class DiskSortedHashTable {
    *                                      // key1 value1 1
    * }
    *
+   * for await (const [key, value, sortValue] of ht.reverseEntriesIterator({ limit: 1 })) {
+   *   console.log(key, value, sortValue) // key3 value3 3
+   * }
+   *
    * for await (const [key, value, sortValue] of ht.reverseEntriesIterator({ startingSortValue: 2, endingSortValue: 1 })) {
    *   console.log(key, value, sortValue) // key2 value2 2
    *                                      // key1 value1 1
    * }
    *
-   * for await (const [key, value, sortValue] of ht.reverseEntriesIterator({ exclusiveStartKey: 'key3' })) {
+   * for await (const [key, value, sortValue] of ht.reverseEntriesIterator({ exclusiveStartKey: "key3" })) {
    *   console.log(key, value, sortValue) // key2 value2 2
    *                                      // key1 value1 1
    * }
    *
-   * for await (const [key, value, sortValue] of ht.reverseEntriesIterator({ exclusiveStartKey: 'key3', endingSortValue: 2 })) {
+   * for await (const [key, value, sortValue] of ht.reverseEntriesIterator({ exclusiveStartKey: "key3", endingSortValue: 2 })) {
    *   console.log(key, value, sortValue) // key2 value2 2
+   * }
+   *
+   * await compositeSortValueHt.set("key1", "value1", "index-key1", 1)
+   * await compositeSortValueHt.set("key2", "value2", "index-key1", 2)
+   * await compositeSortValueHt.set("key3", "value3", "index-key1", 3)
+   *
+   * for await (const [key, value, ...sortValue] of compositeSortValueHt.reverseEntriesIterator({
+   *   startingSortValue: ["index-key1", 3],
+   *   endingSortValue: ["index-key1", 2],
+   * })) {
+   *   console.log(key, value, sortValue) // key2 value2 ["index-key1", 3]
+   *                                      // key3 value3 ["index-key1", 2]
    * }
    * ```
    */
@@ -1034,7 +1167,7 @@ class DiskSortedHashTable {
    *   * `didDelete` - `boolean` - a promise of whether the key and corresponding value were deleted.
    *
    * ```javascript
-   * const didDelete = await sortedHt.delete('my-key')
+   * const didDelete = await sortedHt.delete("my-key")
    * ```
    */
   async delete(key) {}
