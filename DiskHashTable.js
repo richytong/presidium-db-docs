@@ -29,8 +29,8 @@
  *
  * ```javascript
  * const ht = new DiskHashTable({
- *   storagePath: '/path/to/storage-file',
- *   headerPath: '/path/to/header-file',
+ *   storagePath: "/path/to/storage-file",
+ *   headerPath: "/path/to/header-file",
  *   initialLength: 1024,
  *   itemSize: 512 * 1024,
  *   resizeRatio: 0.7,
@@ -55,7 +55,7 @@
  * Each item stored on disk is allocated `itemSize` bytes of disk space. The first 17 bytes are reserved for table operations. The remainder is reserved for the key and value of the item.
  *
  * ## Resizing the disk hash table
- * When an item is inserted into the disk hash table via [set](/docs/DiskHashTable#set), the current capacity ratio of the table is calculated as the sum of the table's count and deleted count divided by the table's length. If the current capacity ratio exceeds the `resizeRatio` (and the `resizeRatio` is not 0), a resize of the table occurs.
+ * When an item is inserted into the disk hash table via [set](/docs/DiskHashTable#set), the current capacity ratio of the table is calculated as the sum of the table"s count and deleted count divided by the table"s length. If the current capacity ratio exceeds the `resizeRatio` (and the `resizeRatio` is not 0), a resize of the table occurs.
  *
  * During a table resize, each item of the table is added into a temporary storage file using the new table length calculated from the equation below:
  *
@@ -192,8 +192,8 @@ class DiskHashTable {
   // _getKeyItem(index number) -> keyItem { index: number, nextIndex: number, keyByteLength: number, valueByteLength: number }
   async _getKeyItem(index) {}
 
-  // _getItem(index number, valueType 'string'|'binary') -> item { index: number, nextIndex: number, value: string }
-  async _getItem(index, valueType = 'binary') {}
+  // _getItem(index number, valueType "string"|"binary") -> item { index: number, nextIndex: number, value: string }
+  async _getItem(index, valueType = "binary") {}
 
   // _setStatusMarker(index number, marker number) -> Promise<>
   async _setStatusMarker(index, marker) {}
@@ -228,14 +228,14 @@ class DiskHashTable {
    *   * Empty promise.
    *
    * ```javascript
-   * await ht.set('my-key', 'my-value')
+   * await ht.set("my-key", "my-value")
    *
-   * await ht.set('my-buffer', Buffer.from('binary'))
+   * await ht.set("my-buffer", Buffer.from("binary"))
    * ```
    */
   async set(key, value) {}
 
-  // _get(key string, valueType 'string'|'binary')
+  // _get(key string, valueType "string"|"binary")
   async _get(key, valueType) {}
 
   /**
@@ -255,7 +255,7 @@ class DiskHashTable {
    *   * `value` - `Promise<string|undefined>` - a promise of the value corresponding to the key. If the key is not found, the promise resolves with `undefined`.
    *
    * ```javascript
-   * const value = await ht.get('my-key')
+   * const value = await ht.get("my-key")
    * ```
    */
   async get(key) {}
@@ -277,7 +277,7 @@ class DiskHashTable {
    *   * `binaryValue` - `Promise<Buffer>` - a promise of the binary value corresponding to the key. If the key is not found, the promise resolves with `undefined`.
    *
    * ```javascript
-   * const buffer = await ht.getBinary('my-buffer')
+   * const buffer = await ht.getBinary("my-buffer")
    * ```
    */
   async getBinary(key) {}
@@ -299,7 +299,7 @@ class DiskHashTable {
    *   * `didDelete` - `Promise<boolean>` - a promise of whether the key and corresponding value was deleted.
    *
    * ```javascript
-   * const didDelete = await ht.delete('my-key')
+   * const didDelete = await ht.delete("my-key")
    * ```
    */
   async delete(key) {}
@@ -358,7 +358,7 @@ class DiskHashTable {
    * iterator() -> values AsyncGenerator<string>
    *
    * iterator(options {
-   *   valueType: 'string'|'binary',
+   *   valueType: "string"|"binary",
    * }) -> values AsyncGenerator<string|Buffer>
    * ```
    *
@@ -367,17 +367,17 @@ class DiskHashTable {
    * Arguments:
    *   * (none) - retrieves the values of all items in the disk hash table.
    *   * `options`
-   *     * `valueType` - `'string'|'binary'` - the type of value that the iterator yields. Defaults to `'string'`.
-   *       * `'string'` - iterator yields `string` values.
-   *       * `'binary'` - iterator yields `Buffer` values.
+   *     * `valueType` - `"string"|"binary"` - the type of value that the iterator yields. Defaults to `"string"`.
+   *       * `"string"` - iterator yields `string` values.
+   *       * `"binary"` - iterator yields `Buffer` values.
    *
    * Return:
    *   * `values` - `AsyncGenerator<string|Buffer>` - an async generator of the values of all items in the disk hash table sorted by reverse insertion order.
    *
    * ```javascript
-   * await ht.set('key1', 'value1')
-   * await ht.set('key2', 'value2')
-   * await ht.set('key3', 'value3')
+   * await ht.set("key1", "value1")
+   * await ht.set("key2", "value2")
+   * await ht.set("key3", "value3")
    *
    * for await (const value of ht.iterator()) {
    *   console.log(value) // value3
@@ -396,7 +396,7 @@ class DiskHashTable {
    * entriesIterator() -> entries AsyncGenerator<[key string, value string]>
    *
    * entriesIterator(options {
-   *   valueType: 'string'|'binary',
+   *   valueType: "string"|"binary",
    * }) -> entries AsyncGenerator<[key string, value string|Buffer]>
    * ```
    *
@@ -405,17 +405,17 @@ class DiskHashTable {
    * Arguments:
    *   * (none) - retrieves the entries of all items in the disk hash table.
    *   * `options`
-   *     * `valueType` - `'string'|'binary'` - the type of value that the iterator yields. Defaults to `'string'`.
-   *       * `'string'` - iterator yields entries with `string` values.
-   *       * `'binary'` - iterator yields entries with `Buffer` values.
+   *     * `valueType` - `"string"|"binary"` - the type of value that the iterator yields. Defaults to `"string"`.
+   *       * `"string"` - iterator yields entries with `string` values.
+   *       * `"binary"` - iterator yields entries with `Buffer` values.
    *
    * Return:
    *   * `entries` - `AsyncGenerator<[key string, value string|Buffer]>` - an async generator of the entries of all items in the disk hash table sorted by reverse insertion order.
    *
    * ```javascript
-   * await ht.set('key1', 'value1')
-   * await ht.set('key2', 'value2')
-   * await ht.set('key3', 'value3')
+   * await ht.set("key1", "value1")
+   * await ht.set("key2", "value2")
+   * await ht.set("key3", "value3")
    *
    * for await (const [key, value] of ht.entriesIterator()) {
    *   console.log(key, value) // key3 value3
