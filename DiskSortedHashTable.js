@@ -629,7 +629,9 @@ class DiskSortedHashTable {
    *
    * @docs
    * ```coffeescript [specscript]
-   * set(key string, value string|Buffer|Uint8Array, ...sortValues Arguments<string|number>) -> Promise<>
+   * set(key string, value string|Buffer|Uint8Array, sortValue string|number) -> Promise<>
+   *
+   * set(key string, value string|Buffer|Uint8Array, ...sortValue Array<string|number>) -> Promise<>
    * ```
    *
    * Sets and stores a value by key and sort value in the disk sorted hash table.
