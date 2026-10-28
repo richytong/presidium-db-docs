@@ -265,7 +265,7 @@ class DiskHashTable {
    *
    * @docs
    * ```coffeescript [specscript]
-   * getBinary(key string) -> binaryValue Promise<Buffer>
+   * getBinary(key string) -> binaryValue Promise<Buffer|undefined>
    * ```
    *
    * Gets a binary value by key from the disk hash table.
@@ -274,7 +274,7 @@ class DiskHashTable {
    *   * `key` - `string` - the key corresponding to the binary value.
    *
    * Return:
-   *   * `binaryValue` - `Promise<Buffer>` - a promise of the binary value corresponding to the key. If the key is not found, the promise resolves with `undefined`.
+   *   * `binaryValue` - `Promise<Buffer|undefined>` - a promise of the binary value corresponding to the key. If the key is not found, the promise resolves with `undefined`.
    *
    * ```javascript
    * const buffer = await ht.getBinary("my-buffer")

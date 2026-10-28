@@ -835,8 +835,6 @@ class DiskSortedHashTable {
    *
    * for await (const value of sortedHt.forwardIterator({ limit: 1 })) {
    *   console.log(value) // value1
-   *                      // value2
-   *                      // value3
    * }
    *
    * for await (const value of sortedHt.forwardIterator({ startingSortValue: 2, endingSortValue: 3 })) {
