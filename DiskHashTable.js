@@ -347,7 +347,7 @@ class DiskHashTable {
    */
   count() {}
 
-  // _itemsIterator() -> items AsyncGenerator<{ index: number, nextIndex: number, key: string, value: string }>
+  // _itemsIterator() -> items AsyncIterator<{ index: number, nextIndex: number, key: string, value: string }>
   async * _itemsIterator() {}
 
   /**
@@ -355,11 +355,11 @@ class DiskHashTable {
    *
    * @docs
    * ```coffeescript [specscript]
-   * iterator() -> values AsyncGenerator<string>
+   * iterator() -> values AsyncIterator<string>
    *
    * iterator(options {
    *   valueType: "string"|"binary",
-   * }) -> values AsyncGenerator<string|Buffer>
+   * }) -> values AsyncIterator<string|Buffer>
    * ```
    *
    * Returns an async iterator of the values of all items in the disk hash table. Item values are yielded in reverse insertion order.
@@ -372,7 +372,7 @@ class DiskHashTable {
    *       * `"binary"` - async iterator yields `Buffer` values.
    *
    * Return:
-   *   * `values` - `AsyncGenerator<string|Buffer>` - an async generator of the values of all items in the disk hash table sorted by reverse insertion order.
+   *   * `values` - `AsyncIterator<string|Buffer>` - an async iterator of the values of all items in the disk hash table sorted by reverse insertion order.
    *
    * ```javascript
    * await ht.set("key1", "value1")
@@ -393,11 +393,11 @@ class DiskHashTable {
    *
    * @docs
    * ```coffeescript [specscript]
-   * entriesIterator() -> entries AsyncGenerator<[key string, value string]>
+   * entriesIterator() -> entries AsyncIterator<[key string, value string]>
    *
    * entriesIterator(options {
    *   valueType: "string"|"binary",
-   * }) -> entries AsyncGenerator<[key string, value string|Buffer]>
+   * }) -> entries AsyncIterator<[key string, value string|Buffer]>
    * ```
    *
    * Returns an async iterator of the entries (keys and values) of all items in the disk hash table. Item entries are yielded in reverse insertion order.
@@ -410,7 +410,7 @@ class DiskHashTable {
    *       * `"binary"` - async iterator yields entries with `Buffer` values.
    *
    * Return:
-   *   * `entries` - `AsyncGenerator<[key string, value string|Buffer]>` - an async generator of the entries of all items in the disk hash table sorted by reverse insertion order.
+   *   * `entries` - `AsyncIterator<[key string, value string|Buffer]>` - an async iterator of the entries of all items in the disk hash table sorted by reverse insertion order.
    *
    * ```javascript
    * await ht.set("key1", "value1")
