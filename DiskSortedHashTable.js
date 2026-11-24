@@ -12,7 +12,7 @@
  *   resizeRatio: number,
  *   resizeFactor: number,
  *   degree: number,
- * }) -> sortedHt DiskSortedHashTable
+ * }) -> ht DiskSortedHashTable
  * ```
  *
  * Presidium DiskSortedHashTable class. Creates a sorted hash table that stores all data on disk.
@@ -33,10 +33,10 @@
  *       * Maximum number of children per b-tree node: `2 * degree`
  *
  * Return:
- *   * `sortedHt` - [`DiskSortedHashTable`](/docs/DiskSortedHashTable) - a `DiskSortedHashTable` instance.
+ *   * `ht` - [`DiskSortedHashTable`](/docs/DiskSortedHashTable) - a `DiskSortedHashTable` instance.
  *
  * ```javascript
- * const sortedHt = new DiskSortedHashTable({
+ * const ht = new DiskSortedHashTable({
  *   storagePath: "/path/to/storage-file",
  *   headerPath: "/path/to/header-file",
  *   initialLength: 1024,
@@ -104,7 +104,7 @@ class DiskSortedHashTable {
    *
    * @docs
    * ```coffeescript [specscript]
-   * sortedHt.init() -> Promise<>
+   * ht.init() -> Promise<>
    * ```
    *
    * Initializes the disk sorted hash table.
@@ -116,7 +116,7 @@ class DiskSortedHashTable {
    *   * Empty promise.
    *
    * ```javascript
-   * await sortedHt.init()
+   * await ht.init()
    * ```
    */
   async init() {}
@@ -138,7 +138,7 @@ class DiskSortedHashTable {
    *   * Empty promise.
    *
    * ```javascript
-   * await sortedHt.clear()
+   * await ht.clear()
    * ```
    */
   async clear() {}
@@ -160,7 +160,7 @@ class DiskSortedHashTable {
    *   * Empty promise.
    *
    * ```javascript
-   * await sortedHt.destroy()
+   * await ht.destroy()
    * ```
    */
   async destroy() {}
@@ -182,7 +182,7 @@ class DiskSortedHashTable {
    *   * `undefined`
    *
    * ```javascript
-   * sortedHt.close()
+   * ht.close()
    * ```
    */
   close() {}
@@ -645,11 +645,11 @@ class DiskSortedHashTable {
    *   * Empty promise.
    *
    * ```javascript
-   * await sortedHt.set("key1", "value1", 1)
-   * await sortedHt.set("key2", "value2", 2)
-   * await sortedHt.set("key3", "value3", 3)
+   * await ht.set("key1", "value1", 1)
+   * await ht.set("key2", "value2", 2)
+   * await ht.set("key3", "value3", 3)
    *
-   * await sortedHt.set("my-buffer", Buffer.from("binary"), 4)
+   * await ht.set("my-buffer", Buffer.from("binary"), 4)
    *
    * await compositeSortValueHt.set("key1", "value1", "index-key1", 1)
    * await compositeSortValueHt.set("key2", "value2", "index-key1", 2)
@@ -678,7 +678,7 @@ class DiskSortedHashTable {
    *   * `value` - `Promise<string|undefined>` - a promise of the string value corresponding to the key. If the key is not found, the promise resolves with `undefined`.
    *
    * ```javascript
-   * const value = await sortedHt.get("my-key")
+   * const value = await ht.get("my-key")
    * ```
    */
   async get(key) {}
@@ -823,31 +823,31 @@ class DiskSortedHashTable {
    *   * `values` - `AsyncGenerator<string|Buffer>` - an async generator of the values of all items in the disk sorted hash table sorted by sort value in ascending order.
    *
    * ```javascript
-   * await sortedHt.set("key1", "value1", 1)
-   * await sortedHt.set("key2", "value2", 2)
-   * await sortedHt.set("key3", "value3", 3)
+   * await ht.set("key1", "value1", 1)
+   * await ht.set("key2", "value2", 2)
+   * await ht.set("key3", "value3", 3)
    *
-   * for await (const value of sortedHt.forwardIterator()) {
+   * for await (const value of ht.forwardIterator()) {
    *   console.log(value) // value1
    *                      // value2
    *                      // value3
    * }
    *
-   * for await (const value of sortedHt.forwardIterator({ limit: 1 })) {
+   * for await (const value of ht.forwardIterator({ limit: 1 })) {
    *   console.log(value) // value1
    * }
    *
-   * for await (const value of sortedHt.forwardIterator({ startingSortValue: 2, endingSortValue: 3 })) {
+   * for await (const value of ht.forwardIterator({ startingSortValue: 2, endingSortValue: 3 })) {
    *   console.log(value) // value2
    *                      // value3
    * }
    *
-   * for await (const value of sortedHt.forwardIterator({ exclusiveStartKey: "key1" })) {
+   * for await (const value of ht.forwardIterator({ exclusiveStartKey: "key1" })) {
    *   console.log(value) // value2
    *                      // value3
    * }
    *
-   * for await (const value of sortedHt.forwardIterator({ exclusiveStartKey: "key1", endingSortValue: 2 })) {
+   * for await (const value of ht.forwardIterator({ exclusiveStartKey: "key1", endingSortValue: 2 })) {
    *   console.log(value) // value2
    * }
    *
@@ -913,7 +913,7 @@ class DiskSortedHashTable {
    *                      // value1
    * }
    *
-   * for await (const value of sortedHt.reverseIterator({ limit: 1 })) {
+   * for await (const value of ht.reverseIterator({ limit: 1 })) {
    *   console.log(value) // value3
    * }
    *
@@ -1167,7 +1167,7 @@ class DiskSortedHashTable {
    *   * `didDelete` - `boolean` - a promise of whether the key and corresponding value were deleted.
    *
    * ```javascript
-   * const didDelete = await sortedHt.delete("my-key")
+   * const didDelete = await ht.delete("my-key")
    * ```
    */
   async delete(key) {}
@@ -1189,7 +1189,7 @@ class DiskSortedHashTable {
    *   * `number` - the number of items in the disk sorted hash table.
    *
    * ```javascript
-   * const count = sortedHt.count()
+   * const count = ht.count()
    * ```
    */
   count() {}

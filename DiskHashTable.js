@@ -296,7 +296,7 @@ class DiskHashTable {
    *   * `key` - `string` - the key to delete.
    *
    * Return:
-   *   * `didDelete` - `Promise<boolean>` - a promise of whether the key and corresponding value was deleted.
+   *   * `didDelete` - `Promise<boolean>` - a promise of whether the key and corresponding value were deleted.
    *
    * ```javascript
    * const didDelete = await ht.delete("my-key")
@@ -362,14 +362,14 @@ class DiskHashTable {
    * }) -> values AsyncGenerator<string|Buffer>
    * ```
    *
-   * Returns an iterator of the values of all items in the disk hash table. Item values are yielded in reverse insertion order.
+   * Returns an async iterator of the values of all items in the disk hash table. Item values are yielded in reverse insertion order.
    *
    * Arguments:
    *   * (none) - retrieves the values of all items in the disk hash table.
    *   * `options`
-   *     * `valueType` - `"string"|"binary"` - the type of value that the iterator yields. Defaults to `"string"`.
-   *       * `"string"` - iterator yields `string` values.
-   *       * `"binary"` - iterator yields `Buffer` values.
+   *     * `valueType` - `"string"|"binary"` - the type of value that the async iterator yields. Defaults to `"string"`.
+   *       * `"string"` - async iterator yields `string` values.
+   *       * `"binary"` - async iterator yields `Buffer` values.
    *
    * Return:
    *   * `values` - `AsyncGenerator<string|Buffer>` - an async generator of the values of all items in the disk hash table sorted by reverse insertion order.
@@ -400,14 +400,14 @@ class DiskHashTable {
    * }) -> entries AsyncGenerator<[key string, value string|Buffer]>
    * ```
    *
-   * Returns an iterator of the entries (keys and values) of all items in the disk hash table. Item entries are yielded in reverse insertion order.
+   * Returns an async iterator of the entries (keys and values) of all items in the disk hash table. Item entries are yielded in reverse insertion order.
    *
    * Arguments:
    *   * (none) - retrieves the entries of all items in the disk hash table.
    *   * `options`
-   *     * `valueType` - `"string"|"binary"` - the type of value that the iterator yields. Defaults to `"string"`.
-   *       * `"string"` - iterator yields entries with `string` values.
-   *       * `"binary"` - iterator yields entries with `Buffer` values.
+   *     * `valueType` - `"string"|"binary"` - the type of value that the async iterator yields. Defaults to `"string"`.
+   *       * `"string"` - async iterator yields entries with `string` values.
+   *       * `"binary"` - async iterator yields entries with `Buffer` values.
    *
    * Return:
    *   * `entries` - `AsyncGenerator<[key string, value string|Buffer]>` - an async generator of the entries of all items in the disk hash table sorted by reverse insertion order.
